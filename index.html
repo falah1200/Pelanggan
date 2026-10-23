@@ -278,7 +278,7 @@
                     </div>
                 </template>
 
-                <!-- TAMPILAN 3: CHECKOUT & GOOGLE MAPS INTERAKTIF ALA SHOPEE -->
+                <!-- TAMPILAN 3: CHECKOUT & GOOGLE MAPS INTERAKTIF  -->
                 <template x-if="step === 'checkout'">
                     <div class="space-y-4">
                         <div class="bg-white border p-4 rounded-2xl shadow-sm space-y-3">
@@ -290,7 +290,7 @@
                                     <i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Posisi Saya
                                 </button>
                             </div>
-                            <p class="text-xs text-slate-500">💡 <strong>Tips ala Shopee:</strong> Geser pin merah atau <strong>ketuk langsung di peta</strong> pada lokasi rumah Anda yang akurat.</p>
+                            <p class="text-xs text-slate-500">💡 <strong>Tips :</strong> Geser pin merah atau <strong>ketuk langsung di peta</strong> pada lokasi rumah Anda yang akurat.</p>
                             
                             <!-- PETA INTERAKTIF -->
                             <div id="map"></div>
@@ -861,16 +861,35 @@
                     setTimeout(() => { this.inisialisasiPeta(); }, 300);
                 },
 
-                // --- PETA INTERAKTIF AKURAT ALA SHOPEE ---
+                /// --- PETA INTERAKTIF AKURAT  (WITH SATELLITE VIEW) ---
                 inisialisasiPeta() {
                     if (this.mapInstance) this.mapInstance.remove();
                     
-                    this.mapInstance = L.map('map').setView([this.posisiUser.lat, this.posisiUser.lng], 17);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    this.mapInstance = L.map('map').setView([this.posisiUser.lat, this.posisiUser.lng], 18);
+                    
+                    // 1. Layer Peta Vektor Biasa (OpenStreetMap)
+                    const layerJalan = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                         maxZoom: 19,
                         attribution: '© OpenStreetMap'
-                    }).addTo(this.mapInstance);
+                    });
+
+                    // 2. Layer Foto Satelit Asli / Rumah (ESRI World Imagery)
+                    const layerSatelit = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        maxZoom: 19,
+                        attribution: 'Tiles © Esri'
+                    });
+
+                    // Pasang layer satelit sebagai tampilan utama agar rumah kelihatan jelas
+                    layerSatelit.addTo(this.mapInstance);
+
+                    // Tambahkan Tombol Beralih Mode (Satelit vs Peta Jalan) di Pojok Kanan Atas Peta
+                    const baseMaps = {
+                        "📷 Foto Satelit (Rumah)": layerSatelit,
+                        "🗺️ Peta Jalan Vektor": layerJalan
+                    };
+                    L.control.layers(baseMaps).addTo(this.mapInstance);
                     
+                    // Tambahkan Pin Merah Interaktif
                     this.markerInstance = L.marker([this.posisiUser.lat, this.posisiUser.lng], { 
                         draggable: true 
                     }).addTo(this.mapInstance);
@@ -890,7 +909,7 @@
                         this.showNotification('📍 Titik lokasi pengiriman diperbarui');
                     });
 
-                    // Event 2: Klik langsung di peta ala Shopee untuk memindahkan pin
+                    // Event 2: Klik langsung di peta untuk memindahkan pin
                     this.mapInstance.on('click', (e) => {
                         const lat = e.latlng.lat;
                         const lng = e.latlng.lng;
