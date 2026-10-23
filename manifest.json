@@ -1,6 +1,7 @@
 {
   "name": "Kasirku Pelanggan",
   "short_name": "Kasirku",
+  "description": "Aplikasi belanja online di toko terdekat dengan pengantaran instan",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f8fafc",
