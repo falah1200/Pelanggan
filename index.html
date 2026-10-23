@@ -278,7 +278,7 @@
                     </div>
                 </template>
 
-                <!-- TAMPILAN 3: CHECKOUT & GOOGLE MAPS INTERAKTIF  -->
+                <!-- TAMPILAN 3: CHECKOUT & GOOGLE MAPS INTERAKTIF -->
                 <template x-if="step === 'checkout'">
                     <div class="space-y-4">
                         <div class="bg-white border p-4 rounded-2xl shadow-sm space-y-3">
@@ -294,7 +294,11 @@
                             
                             <!-- PETA INTERAKTIF -->
                             <div id="map"></div>
-
+                            <div class="pt-2">
+                                <button @click="bukaGoogleMapsLuar()" type="button" class="w-full bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm">
+                                    <i data-lucide="map" class="w-4 h-4"></i> Buka Titik Ini di Google Maps HP (Street View)
+                                </button>
+                            </div>
                             <div class="space-y-2 pt-2">
                                 <label class="text-xs font-bold text-slate-600 uppercase">Nama Penerima & No HP</label>
                                 <input type="text" x-model="checkoutForm.nama" placeholder="Nama Anda" class="w-full bg-slate-50 border rounded-xl px-3.5 py-2.5 text-sm font-medium">
@@ -448,7 +452,7 @@
             </div>
         </template>
 
-        <!-- MODAL LIVE CHAT DENGAN TOKO -->
+        <!-- MODAL LIVE CHAT DENGAN TOKO (DILENGKAPI TOMBOL HAPUS CHAT) -->
         <template x-if="showChatModal">
             <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
                 <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-3 shadow-2xl flex flex-col h-[520px] relative">
@@ -462,9 +466,14 @@
                                 <p class="text-[10px] text-slate-400" x-text="tokoAktif ? tokoAktif.telp : ''"></p>
                             </div>
                         </div>
-                        <button @click="showChatModal = false" class="p-1.5 rounded-xl bg-slate-100 text-slate-500">
-                            <i data-lucide="x" class="w-5 h-5"></i>
-                        </button>
+                        <div class="flex items-center gap-1.5">
+                            <button @click="hapusChatCustomer()" class="p-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100" title="Hapus Chat">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                            <button @click="showChatModal = false" class="p-1.5 rounded-xl bg-slate-100 text-slate-500">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex-1 overflow-y-auto space-y-2.5 p-2 bg-slate-50 rounded-2xl border" id="chatContainerCustomer">
@@ -475,6 +484,9 @@
                                     <span class="text-[9px] opacity-70 block mt-1" x-text="c.time"></span>
                                 </div>
                             </div>
+                        </template>
+                        <template x-if="chatMessages.length === 0">
+                            <div class="text-center py-10 text-slate-400 text-xs">Belum ada percakapan.</div>
                         </template>
                     </div>
 
@@ -516,7 +528,7 @@
                 inputNoHp: '',
                 inputKodeOtp: '',
                 newPassword: '',
-                generatedOtp: '', // Menyimpan kode OTP acak Fonnte
+                generatedOtp: '',
 
                 step: 'pilih_toko',
                 daftarToko: [],
@@ -576,7 +588,6 @@
                     else if (formattedHp.startsWith('+')) formattedHp = formattedHp.slice(1);
 
                     try {
-                        // Cek apakah nomor sudah terdaftar di database
                         const checkDoc = await db.collection('kasirku_customers').doc(formattedHp).get();
                         if (checkDoc.exists) {
                             this.showNotification('Nomor sudah terdaftar! Silakan langsung login.', 'error');
@@ -584,11 +595,9 @@
                             return;
                         }
 
-                        // Buat 6 digit kode OTP acak
                         this.generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
                         this.showNotification('Mengirim OTP via WhatsApp...');
 
-                        // Kirim pesan menggunakan API Fonnte
                         const myHeaders = new Headers();
                         myHeaders.append("Authorization", "cHBYALKpDpvufdcVd3te");
 
@@ -861,7 +870,7 @@
                     setTimeout(() => { this.inisialisasiPeta(); }, 300);
                 },
 
-                /// --- PETA INTERAKTIF AKURAT  (WITH SATELLITE VIEW) ---
+                /// --- PETA INTERAKTIF AKURAT (WITH SATELLITE VIEW) ---
                 inisialisasiPeta() {
                     if (this.mapInstance) this.mapInstance.remove();
                     
@@ -879,17 +888,14 @@
                         attribution: 'Tiles © Esri'
                     });
 
-                    // Pasang layer satelit sebagai tampilan utama agar rumah kelihatan jelas
                     layerSatelit.addTo(this.mapInstance);
 
-                    // Tambahkan Tombol Beralih Mode (Satelit vs Peta Jalan) di Pojok Kanan Atas Peta
                     const baseMaps = {
                         "📷 Foto Satelit (Rumah)": layerSatelit,
                         "🗺️ Peta Jalan Vektor": layerJalan
                     };
                     L.control.layers(baseMaps).addTo(this.mapInstance);
                     
-                    // Tambahkan Pin Merah Interaktif
                     this.markerInstance = L.marker([this.posisiUser.lat, this.posisiUser.lng], { 
                         draggable: true 
                     }).addTo(this.mapInstance);
@@ -898,7 +904,6 @@
                     this.checkoutForm.lng = this.posisiUser.lng;
                     this.jarakPemesananKM = Number(this.hitungJarakKM(this.tokoAktif.lat, this.tokoAktif.lng, this.posisiUser.lat, this.posisiUser.lng).toFixed(2));
 
-                    // Event 1: Ketika pin merah digeser (drag)
                     this.markerInstance.on('dragend', (e) => {
                         const c = e.target.getLatLng();
                         this.checkoutForm.lat = c.lat;
@@ -909,7 +914,6 @@
                         this.showNotification('📍 Titik lokasi pengiriman diperbarui');
                     });
 
-                    // Event 2: Klik langsung di peta untuk memindahkan pin
                     this.mapInstance.on('click', (e) => {
                         const lat = e.latlng.lat;
                         const lng = e.latlng.lng;
@@ -1015,6 +1019,30 @@
                                 chats: firebase.firestore.FieldValue.arrayUnion(msg)
                             });
                         } catch(e){}
+                    }
+                },
+
+                // --- FITUR BARU: HAPUS RIWAYAT OBROLAN/CHAT ---
+                async hapusChatCustomer() {
+                    if (confirm('Apakah Anda yakin ingin menghapus seluruh percakapan?')) {
+                        this.chatMessages = [];
+                        if (this.tokoAktif && this.lastOrderId) {
+                            try {
+                                await db.collection('kasirku_toko').doc(this.tokoAktif.kode).collection('transaksi').doc(this.lastOrderId).update({
+                                    chats: []
+                                });
+                            } catch(e){}
+                        }
+                        this.showNotification('Riwayat chat berhasil dihapus');
+                    }
+                },
+
+                bukaGoogleMapsLuar() {
+                    if (this.checkoutForm.lat && this.checkoutForm.lng) {
+                        const url = `https://www.google.com/maps/search/?api=1&query=${this.checkoutForm.lat},${this.checkoutForm.lng}`;
+                        window.open(url, '_blank');
+                    } else {
+                        this.showNotification('Pilih titik lokasi di peta terlebih dahulu!', 'error');
                     }
                 }
             }
