@@ -1,13 +1,18 @@
 {
-  "name": "Kasirku POS",
+  "name": "Kasirku Pelanggan",
   "short_name": "Kasirku",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#2563eb",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2897/2897785.png",
+      "src": "https://raw.githubusercontent.com/aktifs159/kasirku/refs/heads/main/customer/icon-customer-512.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/aktifs159/kasirku/refs/heads/main/customer/icon-customer-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
