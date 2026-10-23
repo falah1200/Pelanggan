@@ -141,63 +141,64 @@
 
     <!-- ================= APLIKASI UTAMA ================= -->
     <div x-show="isLoggedIn" x-cloak>
-        <header class="sticky top-[27px] z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 py-3 shadow-sm">
-            <div class="max-w-7xl mx-auto flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-11 h-11 rounded-2xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-500/30 font-black text-xl overflow-hidden border">
-                        <template x-if="profilToko.logoImg">
-                            <img :src="profilToko.logoImg" class="w-full h-full object-cover">
-                        </template>
-                        <template x-if="!profilToko.logoImg">
-                            <i data-lucide="store" class="w-6 h-6"></i>
-                        </template>
-                    </div>
-                    <div>
-                        <h1 class="font-extrabold text-lg tracking-tight text-slate-900 flex items-center gap-1.5">
-                            <span x-text="profilToko.nama || 'Kasirku'"></span>
-                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-md" :class="isModeOffline ? 'bg-slate-200 text-slate-700' : (userRole === 'pemilik' ? 'bg-amber-100 text-amber-800' : 'bg-brand-100 text-brand-800')" x-text="isModeOffline ? 'OFFLINE' : (userRole === 'pemilik' ? 'PEMILIK' : 'KARYAWAN')"></span>
-                        </h1>
-                        <p class="text-xs text-slate-500 font-medium truncate max-w-[160px] md:max-w-xs" x-text="isModeOffline ? 'Mode Lokal' : ('Toko: ' + kodeToko)"></p>
-                    </div>
-                </div>
-
-                <!-- NAVIGASI MODE PC (ATAS DENGAN TOMBOL LENGKAP & ICON) -->
-                <nav class="hidden md:flex items-center space-x-1 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200">
-                    <button @click="currentTab = 'dashboard'" :class="currentTab === 'dashboard' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2">
-                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Beranda
-                    </button>
-                    <button @click="currentTab = 'kasir'" :class="currentTab === 'kasir' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2">
-                        <i data-lucide="shopping-bag" class="w-4 h-4"></i> Kasir
-                    </button>
-                    <button @click="currentTab = 'stok'" :class="currentTab === 'stok' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2">
-                        <i data-lucide="boxes" class="w-4 h-4"></i> Stok
-                    </button>
-                    <button @click="currentTab = 'pengeluaran'" :class="currentTab === 'pengeluaran' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2 relative">
-                        <i data-lucide="wallet" class="w-4 h-4"></i> Biaya
-                        <span x-show="!isModeOffline && pesananOnlineList.length > 0" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                    </button>
-                    <button @click="currentTab = 'riwayat'" :class="currentTab === 'riwayat' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2">
-                        <i data-lucide="file-text" class="w-4 h-4"></i> Laporan
-                    </button>
-                </nav>
-                
-                <div class="flex items-center gap-2">
-                    <button @click="bukaLiveChatModalUmum()" class="relative p-2.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold transition hover:bg-indigo-100" title="Live Chat Customer Online">
-                        <i data-lucide="message-square" class="w-5 h-5"></i>
-                        <span x-show="!isModeOffline && pesananOnlineList.length > 0" class="absolute -top-1 -right-1 bg-indigo-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-black animate-pulse" x-text="pesananOnlineList.length"></span>
-                    </button>
-                    <button @click="connectBluetooth()" :class="btDeviceConnected ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'" class="p-2.5 rounded-xl text-sm font-bold border transition hover:bg-slate-200" title="Printer Bluetooth">
-                        <i data-lucide="printer" class="w-5 h-5"></i>
-                    </button>
-                    <button @click="logout()" class="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition" title="Keluar Akun">
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
-                    </button>
-                </div>
+        <header class="sticky top-[27px] z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 md:px-4 py-2.5 shadow-sm overflow-x-hidden">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
+        <!-- PROFIL TOKO & NAMA (MOBILE ADAPTIVE) -->
+        <div class="flex items-center space-x-2 min-w-0 flex-1">
+            <div class="w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-500/30 font-black text-lg md:text-xl overflow-hidden border flex-shrink-0">
+                <template x-if="profilToko.logoImg">
+                    <img :src="profilToko.logoImg" class="w-full h-full object-cover">
+                </template>
+                <template x-if="!profilToko.logoImg">
+                    <i data-lucide="store" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </template>
             </div>
-        </header>
+            <div class="min-w-0 flex-1">
+                <h1 class="font-extrabold text-sm md:text-lg tracking-tight text-slate-900 flex items-center gap-1 truncate">
+                    <span class="truncate" x-text="profilToko.nama || 'Kasirku'"></span>
+                    <span class="text-[9px] md:text-xs font-bold px-1.5 md:px-2.5 py-0.5 rounded-md flex-shrink-0" :class="isModeOffline ? 'bg-slate-200 text-slate-700' : (userRole === 'pemilik' ? 'bg-amber-100 text-amber-800' : 'bg-brand-100 text-brand-800')" x-text="isModeOffline ? 'OFFLINE' : (userRole === 'pemilik' ? 'PEMILIK' : 'KARYAWAN')"></span>
+                </h1>
+                <p class="text-[10px] md:text-xs text-slate-500 font-medium truncate max-w-[110px] sm:max-w-[160px] md:max-w-xs" x-text="isModeOffline ? 'Mode Lokal' : ('Toko: ' + kodeToko)"></p>
+            </div>
+        </div>
+
+        <!-- NAVIGASI MODE PC (ATAS DENGAN TOMBOL LENGKAP & ICON) -->
+        <nav class="hidden md:flex items-center space-x-1 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200">
+            <button @click="currentTab = 'dashboard'" :class="currentTab === 'dashboard' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Beranda
+            </button>
+            <button @click="currentTab = 'kasir'" :class="currentTab === 'kasir' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2">
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i> Kasir
+            </button>
+            <button @click="currentTab = 'stok'" :class="currentTab === 'stok' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2">
+                <i data-lucide="boxes" class="w-4 h-4"></i> Stok
+            </button>
+            <button @click="currentTab = 'pengeluaran'" :class="currentTab === 'pengeluaran' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2 relative">
+                <i data-lucide="wallet" class="w-4 h-4"></i> Biaya
+                <span x-show="!isModeOffline && pesananOnlineList.length > 0" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            </button>
+            <button @click="currentTab = 'riwayat'" :class="currentTab === 'riwayat' ? 'bg-brand-600 text-white shadow-md font-bold' : 'text-slate-600 hover:text-slate-900 font-semibold'" class="px-4 py-2 rounded-xl text-xs transition flex items-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4"></i> Laporan
+            </button>
+        </nav>
+        
+        <!-- ACTION BUTTONS (RINGKAS DI MOBILE) -->
+        <div class="flex items-center gap-1.5 md:gap-2 flex-shrink-0">
+            <button @click="bukaLiveChatModalUmum()" class="relative p-2 md:p-2.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold transition hover:bg-indigo-100" title="Live Chat Customer Online">
+                <i data-lucide="message-square" class="w-4 h-4 md:w-5 md:h-5"></i>
+                <span x-show="!isModeOffline && pesananOnlineList.length > 0" class="absolute -top-1 -right-1 bg-indigo-600 text-white text-[9px] w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center font-black animate-pulse" x-text="pesananOnlineList.length"></span>
+            </button>
+            <button @click="connectBluetooth()" :class="btDeviceConnected ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'" class="p-2 md:p-2.5 rounded-xl text-sm font-bold border transition hover:bg-slate-200" title="Printer Bluetooth">
+                <i data-lucide="printer" class="w-4 h-4 md:w-5 md:h-5"></i>
+            </button>
+            <button @click="logout()" class="p-2 md:p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition" title="Keluar Akun">
+                <i data-lucide="log-out" class="w-4 h-4 md:w-5 md:h-5"></i>
+            </button>
+        </div>
+    </div>
+</header>
 
         <main class="max-w-7xl mx-auto px-4 pt-4">
-
             <!-- Notifikasi Floating -->
             <template x-if="notification.show">
                 <div :class="notification.type === 'success' ? 'bg-slate-900 text-white border-slate-800' : 'bg-rose-600 text-white border-rose-700'" 
