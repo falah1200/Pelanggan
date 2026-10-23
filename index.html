@@ -37,7 +37,7 @@
     <style>
         [x-cloak] { display: none !important; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
-        #map { height: 220px; width: 100%; border-radius: 1rem; z-index: 10; }
+        #map { height: 240px; width: 100%; border-radius: 1rem; z-index: 10; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-950 antialiased min-h-screen pb-20" x-data="customerApp()">
@@ -60,7 +60,6 @@
                 </div>
             </div>
             <div class="flex items-center gap-1.5">
-                <!-- TOMBOL RIWAYAT PEMBELIAN -->
                 <button x-show="isLoggedIn" @click="bukaRiwayatModal()" class="p-2.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl font-bold flex items-center gap-1" title="Riwayat Pembelian">
                     <i data-lucide="receipt" class="w-5 h-5"></i>
                 </button>
@@ -89,8 +88,6 @@
             </div>
         </template>
 
-        <div id="recaptcha-container"></div>
-
         <!-- ================= LOGIN & DAFTAR ================= -->
         <template x-if="!isLoggedIn">
             <div class="min-h-[80vh] flex items-center justify-center">
@@ -100,14 +97,14 @@
                             <i data-lucide="lock" class="w-7 h-7"></i>
                         </div>
                         <h2 class="font-black text-2xl text-slate-900" x-text="authMode === 'login' ? 'Masuk Aplikasi' : 'Daftar Akun Baru'"></h2>
-                        <p class="text-xs text-slate-500" x-text="authMode === 'login' ? 'Masukkan nomor HP dan kata sandi Anda.' : 'Verifikasi nomor HP via SMS untuk membuat kata sandi.'"></p>
+                        <p class="text-xs text-slate-500" x-text="authMode === 'login' ? 'Masukkan nomor WhatsApp dan kata sandi Anda.' : 'Verifikasi nomor WhatsApp via Fonnte untuk membuat kata sandi.'"></p>
                     </div>
 
                     <!-- MODE LOGIN -->
                     <template x-if="authMode === 'login'">
                         <div class="space-y-3">
                             <div>
-                                <label class="text-xs font-bold text-slate-600 uppercase">Nomor HP / WhatsApp</label>
+                                <label class="text-xs font-bold text-slate-600 uppercase">Nomor WhatsApp</label>
                                 <input type="text" x-model="loginNoHp" placeholder="Contoh: 08123456789" class="w-full mt-1 bg-slate-50 border rounded-xl px-3.5 py-3.5 text-sm font-bold focus:outline-none focus:border-brand-600">
                             </div>
                             <div>
@@ -127,11 +124,11 @@
                     <template x-if="authMode === 'daftar_step1'">
                         <div class="space-y-3">
                             <div>
-                                <label class="text-xs font-bold text-slate-600 uppercase">Nomor HP Aktif</label>
+                                <label class="text-xs font-bold text-slate-600 uppercase">Nomor WhatsApp Aktif</label>
                                 <input type="text" x-model="inputNoHp" placeholder="Contoh: 08123456789" class="w-full mt-1 bg-slate-50 border rounded-xl px-3.5 py-3.5 text-sm font-bold focus:outline-none focus:border-brand-600">
                             </div>
-                            <button @click="kirimSmsOtp()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-extrabold py-3.5 rounded-xl text-sm shadow-lg">
-                                Kirim Kode OTP via SMS
+                            <button @click="kirimOtpFonnte()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-extrabold py-3.5 rounded-xl text-sm shadow-lg">
+                                Kirim Kode OTP via WhatsApp
                             </button>
                             <div class="text-center pt-2">
                                 <button @click="authMode = 'login'" class="text-xs text-slate-500 font-bold hover:underline">Sudah punya akun? Masuk</button>
@@ -142,15 +139,15 @@
                     <!-- DAFTAR STEP 2 -->
                     <template x-if="authMode === 'daftar_step2'">
                         <div class="space-y-3">
-                            <div class="bg-blue-50 p-3 rounded-xl text-xs text-blue-800 text-center font-medium">
-                                📩 SMS OTP dikirim ke: <strong x-text="inputNoHp"></strong>
+                            <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs text-emerald-900 text-center font-medium">
+                                💬 Kode OTP WhatsApp telah dikirim ke: <strong x-text="inputNoHp"></strong>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-slate-600 uppercase">Masukkan 6 Digit Kode SMS</label>
+                                <label class="text-xs font-bold text-slate-600 uppercase">Masukkan 6 Digit Kode OTP</label>
                                 <input type="text" x-model="inputKodeOtp" maxlength="6" placeholder="123456" class="w-full mt-1 bg-slate-50 border rounded-xl px-3.5 py-3.5 text-center tracking-widest text-lg font-black focus:outline-none focus:border-brand-600">
                             </div>
-                            <button @click="verifikasiSmsOtpDaftar()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-xl text-sm shadow-lg">
-                                Verifikasi SMS OTP
+                            <button @click="verifikasiOtpFonnteDaftar()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-xl text-sm shadow-lg">
+                                Verifikasi Kode OTP WhatsApp
                             </button>
                         </div>
                     </template>
@@ -159,7 +156,7 @@
                     <template x-if="authMode === 'daftar_step3'">
                         <div class="space-y-3">
                             <div class="bg-emerald-50 p-3 rounded-xl text-xs text-emerald-800 text-center font-medium">
-                                ✅ SMS OTP Terverifikasi! Silakan buat kata sandi akun Anda.
+                                ✅ OTP WhatsApp Terverifikasi! Silakan buat kata sandi akun Anda.
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-slate-600 uppercase">Buat Kata Sandi Baru</label>
@@ -281,26 +278,29 @@
                     </div>
                 </template>
 
-                <!-- TAMPILAN 3: CHECKOUT & GOOGLE MAPS DENGAN AKURASI GPS AKURAT -->
+                <!-- TAMPILAN 3: CHECKOUT & GOOGLE MAPS INTERAKTIF ALA SHOPEE -->
                 <template x-if="step === 'checkout'">
                     <div class="space-y-4">
                         <div class="bg-white border p-4 rounded-2xl shadow-sm space-y-3">
                             <div class="flex justify-between items-center">
                                 <h2 class="font-black text-sm text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                    <i data-lucide="map-pin" class="w-5 h-5 text-brand-600"></i> Lokasi Pengiriman
+                                    <i data-lucide="map-pin" class="w-5 h-5 text-brand-600"></i> Titik Lokasi Pengiriman
                                 </h2>
                                 <button @click="mintaIzinGpsHp()" class="text-[11px] bg-brand-50 text-brand-700 font-bold px-3 py-1.5 rounded-xl border border-brand-200 flex items-center gap-1">
-                                    <i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Update GPS HP
+                                    <i data-lucide="crosshair" class="w-3.5 h-3.5"></i> Posisi Saya
                                 </button>
                             </div>
-                            <p class="text-xs text-slate-500">Peta otomatis membaca lokasi HP Anda. Jika tidak pas, klik 'Update GPS HP' atau geser pin merah.</p>
+                            <p class="text-xs text-slate-500">💡 <strong>Tips ala Shopee:</strong> Geser pin merah atau <strong>ketuk langsung di peta</strong> pada lokasi rumah Anda yang akurat.</p>
+                            
+                            <!-- PETA INTERAKTIF -->
                             <div id="map"></div>
+
                             <div class="space-y-2 pt-2">
                                 <label class="text-xs font-bold text-slate-600 uppercase">Nama Penerima & No HP</label>
                                 <input type="text" x-model="checkoutForm.nama" placeholder="Nama Anda" class="w-full bg-slate-50 border rounded-xl px-3.5 py-2.5 text-sm font-medium">
                                 <input type="text" x-model="checkoutForm.telp" placeholder="No HP" class="w-full bg-slate-50 border rounded-xl px-3.5 py-2.5 text-sm font-medium">
                                 <label class="text-xs font-bold text-slate-600 uppercase">Detail Patokan Alamat Rumah</label>
-                                <textarea x-model="checkoutForm.alamat" rows="2" placeholder="Contoh: Rumah pagar hitam" class="w-full bg-slate-50 border rounded-xl px-3.5 py-2.5 text-sm font-medium"></textarea>
+                                <textarea x-model="checkoutForm.alamat" rows="2" placeholder="Contoh: Rumah pagar hitam, depan pos ronda" class="w-full bg-slate-50 border rounded-xl px-3.5 py-2.5 text-sm font-medium"></textarea>
                             </div>
                         </div>
 
@@ -356,7 +356,7 @@
             </div>
         </template>
 
-        <!-- MODAL KERANJANG (DENGAN TOMBOL BACK & IKON HAPUS) -->
+        <!-- MODAL KERANJANG -->
         <template x-if="showKeranjangModal">
             <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm">
                 <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl">
@@ -402,7 +402,7 @@
             </div>
         </template>
 
-        <!-- MODAL RIWAYAT PEMBELIAN (BARU) -->
+        <!-- MODAL RIWAYAT PEMBELIAN -->
         <template x-if="showRiwayatModal">
             <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
                 <div class="bg-white rounded-3xl p-5 w-full max-w-sm space-y-4 shadow-2xl flex flex-col h-[520px]">
@@ -503,7 +503,6 @@
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
 
         function customerApp() {
             return {
@@ -517,7 +516,7 @@
                 inputNoHp: '',
                 inputKodeOtp: '',
                 newPassword: '',
-                confirmationResult: null,
+                generatedOtp: '', // Menyimpan kode OTP acak Fonnte
 
                 step: 'pilih_toko',
                 daftarToko: [],
@@ -549,10 +548,7 @@
                 },
 
                 init() {
-                    this.$nextTick(() => { 
-                        lucide.createIcons(); 
-                        this.inisialisasiRecaptcha();
-                    });
+                    this.$nextTick(() => { lucide.createIcons(); });
                     if (this.isLoggedIn) {
                         this.deteksiLokasiSaya();
                         this.checkoutForm.telp = this.customerNoHp;
@@ -568,60 +564,19 @@
                     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val || 0);
                 },
 
-                inisialisasiRecaptcha() {
-                    try {
-                        if (!window.recaptchaVerifier) {
-                            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
-                        }
-                    } catch(e) {}
-                },
-
-                async prosesLogin() {
-                    if (!this.loginNoHp || !this.loginPassword) {
-                        this.showNotification('Nomor HP dan kata sandi wajib diisi!', 'error');
-                        return;
-                    }
-
-                    let formattedHp = this.loginNoHp.trim();
-                    if (formattedHp.startsWith('0')) formattedHp = '+62' + formattedHp.slice(1);
-                    else if (!formattedHp.startsWith('+')) formattedHp = '+' + formattedHp;
-
-                    try {
-                        const docRef = await db.collection('kasirku_customers').doc(formattedHp).get();
-                        if (!docRef.exists) {
-                            this.showNotification('Nomor HP belum terdaftar. Silakan daftar!', 'error');
-                            return;
-                        }
-
-                        const dataUser = docRef.data();
-                        if (dataUser.password === this.loginPassword) {
-                            localStorage.setItem('customer_login', 'true');
-                            localStorage.setItem('customer_nohp', formattedHp);
-                            this.isLoggedIn = true;
-                            this.customerNoHp = formattedHp;
-                            this.checkoutForm.telp = formattedHp;
-                            this.deteksiLokasiSaya();
-                            this.showNotification('Login Berhasil!');
-                            this.$nextTick(() => { lucide.createIcons(); });
-                        } else {
-                            this.showNotification('Kata sandi salah!', 'error');
-                        }
-                    } catch (e) {
-                        this.showNotification('Kesalahan sistem database.', 'error');
-                    }
-                },
-
-                async kirimSmsOtp() {
+                // --- INTEGRASI OTP WHATSAPP VIA FONNTE ---
+                async kirimOtpFonnte() {
                     if (!this.inputNoHp || this.inputNoHp.length < 10) {
-                        this.showNotification('Masukkan nomor HP yang valid!', 'error');
+                        this.showNotification('Masukkan nomor WhatsApp yang valid!', 'error');
                         return;
                     }
 
                     let formattedHp = this.inputNoHp.trim();
-                    if (formattedHp.startsWith('0')) formattedHp = '+62' + formattedHp.slice(1);
-                    else if (!formattedHp.startsWith('+')) formattedHp = '+' + formattedHp;
+                    if (formattedHp.startsWith('0')) formattedHp = '62' + formattedHp.slice(1);
+                    else if (formattedHp.startsWith('+')) formattedHp = formattedHp.slice(1);
 
                     try {
+                        // Cek apakah nomor sudah terdaftar di database
                         const checkDoc = await db.collection('kasirku_customers').doc(formattedHp).get();
                         if (checkDoc.exists) {
                             this.showNotification('Nomor sudah terdaftar! Silakan langsung login.', 'error');
@@ -629,32 +584,44 @@
                             return;
                         }
 
-                        this.showNotification('Mengirim SMS OTP...');
-                        const appVerifier = window.recaptchaVerifier;
-                        const confirmationResult = await auth.signInWithPhoneNumber(formattedHp, appVerifier);
-                        this.confirmationResult = confirmationResult;
-                        this.authMode = 'daftar_step2';
-                        this.showNotification('Kode SMS OTP berhasil dikirim!');
+                        // Buat 6 digit kode OTP acak
+                        this.generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+                        this.showNotification('Mengirim OTP via WhatsApp...');
+
+                        // Kirim pesan menggunakan API Fonnte
+                        const myHeaders = new Headers();
+                        myHeaders.append("Authorization", "cHBYALKpDpvufdcVd3te");
+
+                        const urlencoded = new URLSearchParams();
+                        urlencoded.append("target", formattedHp);
+                        urlencoded.append("message", `Halo, Kode OTP pendaftaran akun Kasirku Anda adalah: *${this.generatedOtp}*. Jangan berikan kode ini kepada siapa pun.`);
+
+                        const response = await fetch("https://api.fonnte.com/send", {
+                            method: 'POST',
+                            headers: myHeaders,
+                            body: urlencoded,
+                            redirect: 'follow'
+                        });
+
+                        const result = await response.json();
+                        if (result.status) {
+                            this.authMode = 'daftar_step2';
+                            this.showNotification('✅ OTP WhatsApp berhasil dikirim!');
+                        } else {
+                            this.showNotification('Gagal kirim WhatsApp: ' + (result.reason || 'Cek nomor tujuan'), 'error');
+                        }
                     } catch (error) {
-                        this.showNotification('Gagal kirim SMS: ' + error.message, 'error');
-                        if (window.recaptchaVerifier) window.recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId));
+                        this.showNotification('Koneksi Fonnte Gagal!', 'error');
                     }
                 },
 
-                async verifikasiSmsOtpDaftar() {
-                    if (!this.inputKodeOtp || this.inputKodeOtp.length !== 6) {
-                        this.showNotification('Masukkan 6 digit kode SMS dengan benar!', 'error');
+                verifikasiOtpFonnteDaftar() {
+                    if (!this.inputKodeOtp || this.inputKodeOtp !== this.generatedOtp) {
+                        this.showNotification('Kode OTP WhatsApp salah!', 'error');
                         return;
                     }
-
-                    try {
-                        this.showNotification('Memverifikasi kode...');
-                        await this.confirmationResult.confirm(this.inputKodeOtp);
-                        this.authMode = 'daftar_step3';
-                        this.showNotification('SMS OTP Terverifikasi! Silakan buat sandi.');
-                    } catch (error) {
-                        this.showNotification('Kode OTP SMS salah atau kedaluwarsa!', 'error');
-                    }
+                    this.authMode = 'daftar_step3';
+                    this.showNotification('✅ OTP Terverifikasi! Silakan buat sandi.');
                 },
 
                 async simpanPendaftaran() {
@@ -664,8 +631,8 @@
                     }
 
                     let formattedHp = this.inputNoHp.trim();
-                    if (formattedHp.startsWith('0')) formattedHp = '+62' + formattedHp.slice(1);
-                    else if (!formattedHp.startsWith('+')) formattedHp = '+' + formattedHp;
+                    if (formattedHp.startsWith('0')) formattedHp = '62' + formattedHp.slice(1);
+                    else if (formattedHp.startsWith('+')) formattedHp = formattedHp.slice(1);
 
                     try {
                         await db.collection('kasirku_customers').doc(formattedHp).set({
@@ -684,6 +651,41 @@
                         this.$nextTick(() => { lucide.createIcons(); });
                     } catch (e) {
                         this.showNotification('Gagal menyimpan data akun ke server.', 'error');
+                    }
+                },
+
+                async prosesLogin() {
+                    if (!this.loginNoHp || !this.loginPassword) {
+                        this.showNotification('Nomor WhatsApp dan kata sandi wajib diisi!', 'error');
+                        return;
+                    }
+
+                    let formattedHp = this.loginNoHp.trim();
+                    if (formattedHp.startsWith('0')) formattedHp = '62' + formattedHp.slice(1);
+                    else if (formattedHp.startsWith('+')) formattedHp = formattedHp.slice(1);
+
+                    try {
+                        const docRef = await db.collection('kasirku_customers').doc(formattedHp).get();
+                        if (!docRef.exists) {
+                            this.showNotification('Nomor belum terdaftar. Silakan daftar!', 'error');
+                            return;
+                        }
+
+                        const dataUser = docRef.data();
+                        if (dataUser.password === this.loginPassword) {
+                            localStorage.setItem('customer_login', 'true');
+                            localStorage.setItem('customer_nohp', formattedHp);
+                            this.isLoggedIn = true;
+                            this.customerNoHp = formattedHp;
+                            this.checkoutForm.telp = formattedHp;
+                            this.deteksiLokasiSaya();
+                            this.showNotification('Login Berhasil!');
+                            this.$nextTick(() => { lucide.createIcons(); });
+                        } else {
+                            this.showNotification('Kata sandi salah!', 'error');
+                        }
+                    } catch (e) {
+                        this.showNotification('Kesalahan sistem database.', 'error');
                     }
                 },
 
@@ -715,7 +717,7 @@
                                 this.posisiUser.lat = pos.coords.latitude;
                                 this.posisiUser.lng = pos.coords.longitude;
                                 if (this.mapInstance && this.markerInstance) {
-                                    this.mapInstance.setView([this.posisiUser.lat, this.posisiUser.lng], 16);
+                                    this.mapInstance.setView([this.posisiUser.lat, this.posisiUser.lng], 17);
                                     this.markerInstance.setLatLng([this.posisiUser.lat, this.posisiUser.lng]);
                                     this.checkoutForm.lat = this.posisiUser.lat;
                                     this.checkoutForm.lng = this.posisiUser.lng;
@@ -726,7 +728,7 @@
                                 this.showNotification('✅ GPS HP Berhasil Terdeteksi!');
                             },
                             (err) => {
-                                this.showNotification('Pastikan Izin Lokasi GPS di HP diaktifkan!', 'error');
+                                this.showNotification('Aktifkan izin lokasi GPS di browser/HP Anda!', 'error');
                             },
                             { enableHighAccuracy: true, timeout: 15000 }
                         );
@@ -859,25 +861,50 @@
                     setTimeout(() => { this.inisialisasiPeta(); }, 300);
                 },
 
+                // --- PETA INTERAKTIF AKURAT ALA SHOPEE ---
                 inisialisasiPeta() {
                     if (this.mapInstance) this.mapInstance.remove();
-                    this.mapInstance = L.map('map').setView([this.posisiUser.lat, this.posisiUser.lng], 16);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.mapInstance);
                     
-                    this.markerInstance = L.marker([this.posisiUser.lat, this.posisiUser.lng], { draggable: true }).addTo(this.mapInstance);
+                    this.mapInstance = L.map('map').setView([this.posisiUser.lat, this.posisiUser.lng], 17);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '© OpenStreetMap'
+                    }).addTo(this.mapInstance);
+                    
+                    this.markerInstance = L.marker([this.posisiUser.lat, this.posisiUser.lng], { 
+                        draggable: true 
+                    }).addTo(this.mapInstance);
                     
                     this.checkoutForm.lat = this.posisiUser.lat;
                     this.checkoutForm.lng = this.posisiUser.lng;
                     this.jarakPemesananKM = Number(this.hitungJarakKM(this.tokoAktif.lat, this.tokoAktif.lng, this.posisiUser.lat, this.posisiUser.lng).toFixed(2));
 
+                    // Event 1: Ketika pin merah digeser (drag)
                     this.markerInstance.on('dragend', (e) => {
                         const c = e.target.getLatLng();
                         this.checkoutForm.lat = c.lat;
                         this.checkoutForm.lng = c.lng;
-                        this.jarakPemesananKM = Number(this.hitungJarakKM(this.tokoAktif.lat, this.tokoAktif.lng, c.lat, c.lng).toFixed(2));
+                        if (this.tokoAktif) {
+                            this.jarakPemesananKM = Number(this.hitungJarakKM(this.tokoAktif.lat, this.tokoAktif.lng, c.lat, c.lng).toFixed(2));
+                        }
+                        this.showNotification('📍 Titik lokasi pengiriman diperbarui');
                     });
 
-                    // Otomatis minta izin lokasi GPS akurasi tinggi
+                    // Event 2: Klik langsung di peta ala Shopee untuk memindahkan pin
+                    this.mapInstance.on('click', (e) => {
+                        const lat = e.latlng.lat;
+                        const lng = e.latlng.lng;
+                        
+                        this.markerInstance.setLatLng([lat, lng]);
+                        this.checkoutForm.lat = lat;
+                        this.checkoutForm.lng = lng;
+                        
+                        if (this.tokoAktif) {
+                            this.jarakPemesananKM = Number(this.hitungJarakKM(this.tokoAktif.lat, this.tokoAktif.lng, lat, lng).toFixed(2));
+                        }
+                        this.showNotification('📍 Titik peta dipilih');
+                    });
+
                     this.mintaIzinGpsHp();
                 },
 
@@ -897,7 +924,7 @@
                     }
                     const jarakOrder = this.hitungJarakKM(this.tokoAktif.lat, this.tokoAktif.lng, this.checkoutForm.lat, this.checkoutForm.lng);
                     if (jarakOrder > 2.0) {
-                        this.showNotification('Pengantaran melebihi batas 2 KM!', 'error');
+                        this.showNotification('Pengantaran melebihi batas maksimal 2 KM!', 'error');
                         return;
                     }
 
